@@ -1,0 +1,19 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: kepegawaian_db
+    environment:
+      POSTGRES_DB: kepegawaian
+      POSTGRES_USER: kepegawaian
+      POSTGRES_PASSWORD: kepegawaian
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U kepegawaian -d kepegawaian"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+volumes:
+  db_data:
