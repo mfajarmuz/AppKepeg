@@ -35,22 +35,34 @@ The easiest way to deploy your Next.js app is to use the [Vercel Platform](https
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
 
-## Local dev (VPS)
+## Setup (Supabase Postgres)
+
+1) Copy env
 
 ```bash
-# start postgres
-sudo docker-compose up -d
+cp .env.example .env
+```
 
-# apply migrations
-npx prisma migrate dev
+2) Set `DATABASE_URL` to your Supabase direct connection string (password must be URL-encoded if it has special chars).
 
-# seed default admin
+3) Run migrations
+
+```bash
+npx prisma migrate deploy
+```
+
+4) Seed default admin
+
+```bash
 npm run db:seed
+```
 
-# run app
+5) Run app
+
+```bash
 npm run dev
 ```
 
 Default admin:
-- email: `admin@local`
+- email: `admin`
 - password: `admin`
