@@ -43,12 +43,17 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 cp .env.example .env
 ```
 
-2) Set `DATABASE_URL` to your Supabase direct connection string (password must be URL-encoded if it has special chars).
+2) Set env
+
+- `DATABASE_URL` = Supabase Transaction Pooler (6543) for runtime
+- `DATABASE_URL_DIRECT` = Supabase Direct (5432) for Prisma migrate/DDL
+
+Password in URL must be URL-encoded if it contains special chars.
 
 3) Run migrations
 
 ```bash
-npx prisma migrate deploy
+DATABASE_URL="$DATABASE_URL_DIRECT" npx prisma migrate deploy
 ```
 
 4) Seed default admin
