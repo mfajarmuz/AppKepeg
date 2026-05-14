@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createSessionToken, AUTH_COOKIE } from "@/lib/auth";
+import { verifyPassword } from "@/lib/password";
 
 export const runtime = "nodejs";
 
@@ -12,27 +13,21 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Email dan password wajib." }, { status: 400 });
   }
 
-  // MVP fallback: because DB/docker isn't available on this VPS yet.
-  // Default admin credentials (dev only): admin@local / admin
-  if (process.env.NODE_ENV !== "production") {
-    if (email === "admin@local" && password === "admin") {
-      const token = createSessionToken({ id: "dev-admin", email, name: "Admin", role: "ADMIN" });
-      const res = NextResponse.json({ ok: true });
-      res.cookies.set(AUTH_COOKIE, token, {
-        httpOnly: true,
-        sameSite: "lax",
-        secure: false,
-        path: "/",
-        maxAge: 60 * 60 * 24 * 7,
-      });
-      return res;
-    }
+  const { prisma } = await import("@/lib/db");
 
-    return NextResponse.json(
-      { error: "Dev login: gunakan admin@local / admin (DB belum aktif)." },
-      { status: 401 }
-    );
+  const user = await prisma.user.findUnique({ where: { email } });
+  if (!user || !verifyPassword(password, user.passwordHash)) {
+    return NextResponse.json({ error: "Email atau password salah." }, { status: 401 });
   }
 
-  return NextResponse.json({ error: "Login production belum dikonfigurasi." }, { status: 501 });
+  const token = createSessionToken({ id: user.id, email: user.email, name: user.name, role: "ADMIN" });
+  const res = NextResponse.json({ ok: true });
+  res.cookies.set(AUTH_COOKIE, token, {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+    path: "/",
+    maxAge: 60 * 60 * 24 * 7,
+  });
+  return res;
 }
