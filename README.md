@@ -29,13 +29,29 @@ To learn more about Next.js, take a look at the following resources:
 
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-## Deploy on Vercel
+## Deploy to Vercel (recommended)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1) Import GitHub repo in Vercel
+- Vercel Dashboard → **Add New → Project** → Import `mfajarmuz/AppKepeg`
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+2) Set Environment Variables (Project → Settings → Environment Variables)
+- `DATABASE_URL` = **Supabase Transaction Pooler (6543)** (recommended for runtime on serverless)
+
+Optional (recommended for migrations):
+- `DATABASE_URL_DIRECT` = **Supabase Direct (5432)** (DDL/migrations)
+
+Security:
+- **Do not commit** `.env` or secrets.
+- Never expose `SUPABASE_SERVICE_ROLE_KEY` to the browser.
+
+3) Prisma migrations (important)
+- Do **NOT** run `prisma migrate dev` during Vercel build.
+- Run migrations separately using `prisma migrate deploy`, e.g.:
+  - manually from your machine, or
+  - via GitHub Actions before/after deploy.
 
 ## Setup (Supabase Postgres)
+
 
 1) Copy env
 
